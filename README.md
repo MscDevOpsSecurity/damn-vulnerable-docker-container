@@ -2,7 +2,8 @@
 <img widt=600 src="static/dvdc.png">
 </p>
 
-> Disclamer: This Image is broken by design and is dedicated to learn some techniques to dive into a dumpster and search for treasures
+##### Disclamer:
+> This Image is broken by design and dedicated to learn some techniques to dive into a dumpster and search for treasures
 
 <br>
 <br>
