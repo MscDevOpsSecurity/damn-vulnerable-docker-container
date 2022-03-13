@@ -8,7 +8,7 @@ COPY containerfiles /
 USER 0 
 
 RUN apk add wireguard-tools curl wireguard-tools-wg && \
-    modprobe wireguard
+    bash /app/docker-install.sh
 
 # Install and configure kubectl
 RUN curl -kLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -16,4 +16,4 @@ ENV KUBECONFIG=/opt/kubernetes
 
 WORKDIR /opt/kubernetes
 
-CMD [ "dockerentry.sh" ]
+CMD [ "/app/dockerentry.sh" ]
