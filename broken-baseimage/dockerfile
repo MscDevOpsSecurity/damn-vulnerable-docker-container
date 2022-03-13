@@ -1,19 +1,18 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM alpine
 
 ENV AWS_ACCESS_KEY=AKIAYVP4CIPPOWONZTGT
 ENV AWS_SECRET_ACCESS_KEY=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
 
 COPY containerfiles /
+# GOD MODE YAAAY
+USER 0 
+
+RUN apk add wireguard-tools curl wireguard-tools-wg && \
+    modprobe wireguard
 
 # Install and configure kubectl
 RUN curl -kLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 ENV KUBECONFIG=/opt/kubernetes
-
-# GOD MODE YAAAY
-USER 0 
-
-RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm && \
-    yum install kmod-wireguard wireguard-tools
 
 WORKDIR /opt/kubernetes
 
