@@ -1,3 +1,5 @@
+[![Broken Baseimage Docker](https://github.com/BenjiTrapp/damn-vulnerable-docker-container/actions/workflows/build-and-publish-baseimage.yml/badge.svg)](https://github.com/BenjiTrapp/damn-vulnerable-docker-container/actions/workflows/build-and-publish-baseimage.yml)
+
 <p align="center">
 <img widt=600 src="static/dvdc.png">
 </p>
