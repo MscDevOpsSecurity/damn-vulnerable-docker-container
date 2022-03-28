@@ -1,4 +1,41 @@
+If you're familar with docker a first naive approach to inspect the docker layers could be:
 
+```bash
+sudo docker history ghcr.io/benjitrapp/damn-vulnerable-docker-container:main
+IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
+cc0d35b829f0   6 days ago    CMD ["/app/dockerentry.sh"]                     0B        buildkit.dockerfile.v0
+<missing>      6 days ago    WORKDIR /opt/kubernetes                         0B        buildkit.dockerfile.v0
+<missing>      6 days ago    ENV KUBECONFIG=/opt/kubernetes                  0B        buildkit.dockerfile.v0
+<missing>      6 days ago    RUN /bin/sh -c curl -kLO "https://dl.k8s.io/…   46.6MB    buildkit.dockerfile.v0
+<missing>      6 days ago    RUN /bin/sh -c apk add wireguard-tools curl …   11.9MB    buildkit.dockerfile.v0
+<missing>      6 days ago    USER 0                                          0B        buildkit.dockerfile.v0
+<missing>      6 days ago    COPY containerfiles / # buildkit                11.4kB    buildkit.dockerfile.v0
+<missing>      6 days ago    ENV AWS_SECRET_ACCESS_KEY=mk30783jZKr8zVp8M6…   0B        buildkit.dockerfile.v0
+<missing>      6 days ago    ENV AWS_ACCESS_KEY=AKIAYVP4CIPPOWONZTGT         0B        buildkit.dockerfile.v0
+<missing>      11 days ago   /bin/sh -c #(nop)  CMD ["/bin/sh"]              0B        
+<missing>      11 days ago   /bin/sh -c #(nop) ADD file:cf4b631a115c2bbfb…   5.57MB    
+```
+
+This command will reveal the Secrets hidden in the environment variables - but be shorten so that we can't just copy and paste it. Tweaking the command will lead to this result:
+
+```bash
+sudo docker history ghcr.io/benjitrapp/damn-vulnerable-docker-container:main --no-trunc --human                
+IMAGE                                                                     CREATED       CREATED BY                                                                                                                                   SIZE      COMMENT
+sha256:cc0d35b829f0a8596a9c6015f38a6f5d396186f546fe86a06160b841640bef0a   6 days ago    CMD ["/app/dockerentry.sh"]                                                                                                                  0B        buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    WORKDIR /opt/kubernetes                                                                                                                      0B        buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    ENV KUBECONFIG=/opt/kubernetes                                                                                                               0B        buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    RUN /bin/sh -c curl -kLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" # buildkit   46.6MB    buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    RUN /bin/sh -c apk add wireguard-tools curl wireguard-tools-wg &&     bash /app/docker-install.sh # buildkit                                 11.9MB    buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    USER 0                                                                                                                                       0B        buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    COPY containerfiles / # buildkit                                                                                                             11.4kB    buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    ENV AWS_SECRET_ACCESS_KEY=mk30783jZKr8zVp8M6HtYG9rs85r8XTVo2FkfHe0                                                                           0B        buildkit.dockerfile.v0
+<missing>                                                                 6 days ago    ENV AWS_ACCESS_KEY=AKIAYVP4CIPPOWONZTGT                                                                                                      0B        buildkit.dockerfile.v0
+<missing>                                                                 11 days ago   /bin/sh -c #(nop)  CMD ["/bin/sh"]                                                                                                           0B        
+<missing>                                                                 11 days ago   /bin/sh -c #(nop) ADD file:cf4b631a115c2bbfbd81cad2d3041bceb64a8136aac92ba8a63b6c51d60af764 in /                                             5.57MB    
+```
+
+
+Let's check some more advanced tools:
 Running `$skopeo inspect --config docker://ghcr.io/benjitrapp/damn-vulnerable-docker-container:main` will lead to this json output: 
 
 ```json
